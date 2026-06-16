@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoQuest Brasil - Infográfico Interativo</title>
+    <style>
+        :root {
+            --bg-color: #0f111a;
+            --card-bg: #1e2235;
+            --accent-pink: #ff65a3;
+            --accent-blue: #00e5ff;
+            --accent-yellow: #ffca28;
+            --accent-purple: #b388ff;
+            --text-color: #ffffff;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-family);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #1a1c2e, #0d0e15);
+            width: 100%;
+            border-bottom: 4px solid var(--accent-pink);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 0 10px var(--accent-pink);
+            color: var(--accent-pink);
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            color: #8b92b6;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 90%;
+            margin: 30px auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 25px;
+        }
+
+        /* Menu de Navegação estilo Abas de Anime */
+        .nav-tabs {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 10px;
+            background: #151726;
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid #2d314d;
+        }
+
+        .tab-btn {
+            background: #252841;
+            color: #fff;
+            border: 2px solid transparent;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .tab-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .tab-btn.active[data-target="topico1"] { border-color: var(--accent-blue); box-shadow: 0 0 15px var(--accent-blue); color: var(--accent-blue); }
+        .tab-btn.active[data-target="topico2"] { border-color: var(--accent-pink); box-shadow: 0 0 15px var(--accent-pink); color: var(--accent-pink); }
+        .tab-btn.active[data-target="topico3"] { border-color: var(--accent-yellow); box-shadow: 0 0 15px var(--accent-yellow); color: var(--accent-yellow); }
+        .tab-btn.active[data-target="topico4"] { border-color: var(--accent-purple); box-shadow: 0 0 15px var(--accent-purple); color: var(--accent-purple); }
+
+        /* Área de Conteúdo Dinâmico */
+        .content-section {
+            display: none;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            animation: fadeIn 0.5s ease-in-out forwards;
+        }
+
+        .content-section.active {
+            display: grid;
+        }
+
+        @media (min-width: 768px) {
+            .content-section {
+                grid-template-columns: 300px 1fr;
+            }
+        }
+
+        /* Container do Personagem */
+        .character-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            border: 3px solid #2d314d;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+            position: relative;
+        }
+
+        .character-img {
+            width: 100%;
+            max-width: 240px;
+            height: auto;
+            object-fit: contain;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .character-box:hover .character-img {
+            transform: scale(1.05);
+        }
+
+        .character-name {
+            margin-top: 15px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            padding: 5px 20px;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+
+        /* Estilos de Cores por Tópico */
+        .topico1-theme { border-color: var(--accent-blue) !important; }
+        .topico1-name { background: var(--accent-blue); color: #000; }
+        .topico2-theme { border-color: var(--accent-pink) !important; }
+        .topico2-name { background: var(--accent-pink); color: #000; }
+        .topico3-theme { border-color: var(--accent-yellow) !important; }
+        .topico3-name { background: var(--accent-yellow); color: #000; }
+        .topico4-theme { border-color: var(--accent-purple) !important; }
+        .topico4-name { background: var(--accent-purple); color: #000; }
+
+        /* Balão de Diálogo Estilo Visual Novel */
+        .dialogue-box {
+            background: rgba(21, 23, 38, 0.95);
+            border: 2px solid #2d314d;
+            border-radius: 15px;
+            padding: 20px;
+            margin-top: 15px;
+            position: relative;
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        /* Painel de Informações Geográficas */
+        .info-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 30px;
+            border: 3px solid #2d314d;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+        }
+
+        .info-card h2 {
+            margin-top: 0;
+            font-size: 1.8rem;
+            border-bottom: 2px solid #2d314d;
+            padding-bottom: 10px;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (min-width: 992px) {
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .data-box {
+            background: #151726;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 5px solid transparent;
+        }
+
+        .data-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            color: #8b92b6;
+        }
+
+        .data-box p {
+            margin: 0;
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        /* Animações */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>GeoQuest Brasil</h1>
+        <p>Explore a Geografia e as Divisões Territoriais com seus Tutores Anime!</p>
+    </header>
+
+    <div class="container">
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-target="topico1">Extensão e Localização</button>
+            <button class="tab-btn" data-target="topico2">Evolução Territorial</button>
+            <button class="tab-btn" data-target="topico3">As Regionalizações</button>
+            <button class="tab-btn" data-target="topico4">Região Nordeste</button>
+        </div>
+
+        <div id="topico1" class="content-section active">
+            <div class="character-box topico1-theme">
+                <img src="Kode.png" alt="Kode" class="character-img">
+                <div class="character-name topico1-name">Kode</div>
+                <div class="dialogue-box">"Sabia que o Brasil é o 5º maior país do mundo? Nosso tamanho continental traz desafios gigantescos e fusos horários bem malucos!"</div>
+            </div>
+            <div class="info-card topico1-theme">
+                <h2 style="color: var(--accent-blue);">1.1 - Dimensões e Fronteiras</h2>
+                <div class="info-grid">
+                    <div class="data-box" style="border-left-color: var(--accent-blue);">
+                        <h3>Dimensões Continentais</h3>
+                        <p>O território brasileiro apresenta uma área de <strong>8.515.759 km²</strong>, tornando-o ligeiramente menor que a Oceania inteira. Faz fronteira com quase todos os países da América do Sul, exceto Chile e Equador.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-blue);">
+                        <h3>Pontos Extremos</h3>
+                        <p><strong>Norte:</strong> Monte Caburaí (RR) | <strong>Sul:</strong> Arroio Chuí (RS)<br><strong>Leste:</strong> Ponta do Seixas (PB) | <strong>Oeste:</strong> Serra da Contamana (AC).</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-blue);">
+                        <h3>Fusos Horários do Brasil</h3>
+                        <p>O Brasil possui <strong>4 fusos horários</strong> (GMT-2 nas ilhas até GMT-5 no extremo oeste do Amazonas e Acre). O fuso oficial de Brasília é o <strong>GMT-3</strong>.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-blue);">
+                        <h3>Zona Econômica Exclusiva</h3>
+                        <p>A imensa extensão de ilhas oceânicas (como Fernando de Noronha) expande os direitos marítimos e econômicos do país no Oceano Atlântico, protegendo nossa rica biodiversidade azul.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="topico2" class="content-section">
+            <div class="character-box topico2-theme">
+                <img src="Batata.jpg" alt="Batata" class="character-img">
+                <div class="character-name topico2-name">Batata</div>
+                <div class="dialogue-box">"Com o meu cajado do tempo, posso ver o Brasil colônia! De Tratado em Tratado, moldamos o mapa que você conhece hoje!"</div>
+            </div>
+            <div class="info-card topico2-theme">
+                <h2 style="color: var(--accent-pink);">1.2 - Divisões Históricas do Espaço</h2>
+                <div class="info-grid">
+                    <div class="data-box" style="border-left-color: var(--accent-pink);">
+                        <h3>Tratado de Tordesilhas (1494)</h3>
+                        <p>Dividiu o "Novo Mundo" entre Portugal e Espanha. Em 1534, a Coroa portuguesa implementou o sistema de <strong>Capitanias Hereditárias</strong> para descentralizar e proteger a colônia.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-pink);">
+                        <h3>A Expansão e o Tratado de Madri (1750)</h3>
+                        <p>Impulsionada pela ação de bandeirantes e pela pecuária, a expansão ultrapassou Tordesilhas. O Tratado de Madri usou o princípio do <em>uti possidetis</em> para legitimar as novas fronteiras portuguesas.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-pink);">
+                        <h3>Independência e Consolidação (1822)</h3>
+                        <p>O Brasil tornou-se um Império centralizado em Províncias. A Guerra do Paraguai (1864-1870) e o Tratado de Petrópolis (1903), que incorporou o Acre, ajudaram a consolidar os contornos atuais.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-pink);">
+                        <h3>A República Federativa</h3>
+                        <p>Com a constituição republicana de 1891, as províncias tornaram-se Estados autônomos. Atualmente, a federação é constituída por <strong>26 Estados e 1 Distrito Federal</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="topico3" class="content-section">
+            <div class="character-box topico3-theme">
+                <img src="Doci.jpg" alt="Doci" class="character-img">
+                <div class="character-name topico3-name">Doci</div>
+                <div class="dialogue-box">"Classificar o território nos ajuda a governar melhor. Existem diferentes maneiras de dividir o Brasil dependendo do foco analítico!"</div>
+            </div>
+            <div class="info-card topico3-theme">
+                <h2 style="color: var(--accent-yellow);">1.3 - Modelos de Regionalização</h2>
+                <div class="info-grid">
+                    <div class="data-box" style="border-left-color: var(--accent-yellow);">
+                        <h3>Divisão Oficial do IBGE (1969)</h3>
+                        <p>Divide o Brasil em <strong>5 Macrorregiões</strong>: Norte, Nordeste, Centro-Oeste, Sudeste e Sul. Baseia-se em critérios combinados de aspectos naturais, sociais e demográficos, respeitando estritamente os limites estaduais.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-yellow);">
+                        <h3>Complexos Geoeconômicos (1967)</h3>
+                        <p>Proposta por Pedro Pinchas Geiger, divide o país em 3 regiões: <strong>Amazônia, Nordeste e Centro-Sul</strong>. O foco são as dinâmicas socioeconômicas e históricas, não obedecendo às linhas dos limites dos estados.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-yellow);">
+                        <h3>Os "Quatro Brasis" (2001)</h3>
+                        <p>Proposta por Milton Santos e Maria Laura Silveira. Classifica o país conforme a difusão do meio técnico-científico-informacional em: <strong>Amazônia, Nordeste, Centro-Oeste e Região Concentrada</strong> (Sul e Sudeste integrados pelo fluxo tecnológico).</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="topico4" class="content-section">
+            <div class="character-box topico4-theme">
+                <img src="Yuyu.png" alt="Yuyu" class="character-img">
+                <div class="character-name topico4-name">Yuyu</div>
+                <div class="dialogue-box">"O Nordeste tem paisagens e histórias fascinantes escondidas sob suas quatro sub-regiões únicas! Venha ver!"</div>
+            </div>
+            <div class="info-card topico4-theme">
+                <h2 style="color: var(--accent-purple);">1.4 - Aspectos do Nordeste Brasileiro</h2>
+                <div class="info-grid">
+                    <div class="data-box" style="border-left-color: var(--accent-purple);">
+                        <h3>A Região</h3>
+                        <p>Composta por <strong>9 estados</strong>, abriga mais de 55 milhões de habitantes. Foi o principal centro econômico colonial nos séculos XVI e XVII devido ao cultivo da cana-de-açúcar.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-purple);">
+                        <h3>Sub-regiões: Zona da Mata e Agreste</h3>
+                        <p><strong>Zona da Mata:</strong> Faixa litorânea úmida, mais urbanizada e industrializada.<br><strong>Agreste:</strong> Faixa de transição do litoral para o interior, marcada pela policultura familiar e polo têxtil.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-purple);">
+                        <h3>Sub-regiões: Sertão e Meio-Norte</h3>
+                        <p><strong>Sertão:</strong> Clima semiárido dominante e vegetação de caatinga. O Rio São Francisco destaca-se como rio perene essencial para a irrigação.<br><strong>Meio-Norte:</strong> Transição para a Amazônia, onde se destaca a Mata dos Cocais.</p>
+                    </div>
+                    <div class="data-box" style="border-left-color: var(--accent-purple);">
+                        <h3>Fluxos Migratórios de Retorno</h3>
+                        <p>Historicamente terra de emigração no século XX rumo ao Sudeste, a partir da década de 1990 o Nordeste passou a atrair investimentos industriais, gerando um expressivo fluxo de <strong>migração de retorno</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Lógica de Alternância das Abas Interativas
+        const buttons = document.querySelectorAll('.tab-btn');
+        const sections = document.querySelectorAll('.content-section');
+
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove classe ativa de todos os botões e seções
+                buttons.forEach(btn => btn.classList.remove('active'));
+                sections.forEach(sec => sec.classList.remove('active'));
+
+                // Adiciona classe ativa no botão clicado e na seção correspondente
+                button.classList.add('active');
+                const target = button.getAttribute('data-target');
+                document.getElementById(target).classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
